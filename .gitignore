@@ -1,0 +1,8 @@
+.nextflow*
+work/
+./nextflow/
+*.txt
+*.map
+trial*
+Trial*
+101*
