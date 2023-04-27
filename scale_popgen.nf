@@ -14,9 +14,8 @@ nextflow.enable.dsl=2
 
 //include { CONVERT_BED_TO_VCF } from "${baseDir}/modules/plink/convert_bed_to_vcf"
 
-//include { SPLIT_IDFILE_BY_POP } from "${baseDir}/modules/selection/split_idfile_by_pop"
+include { SPLIT_IDFILE_BY_POP } from "${baseDir}/modules/selection/split_idfile_by_pop"
 
-//include { SPLIT_VCF_BY_CHROM } from "${baseDir}/modules/selection/split_vcf_by_chrom"
 
 
 
@@ -47,7 +46,7 @@ include { RUN_TREEMIX } from "${baseDir}/subworkflows/run_treemix"
 
 //include { RUN_PAIRWISE_FST } from "${baseDir}/subworkflows/run_pairwise_fst"
 
-//include { RUN_SIG_SELECTION } from "${baseDir}/subworkflows/run_sig_selection"
+include { RUN_SIG_SEL_WITHIN_POP } from "${baseDir}/subworkflows/run_sig_sel_within_pop"
 
 
 
@@ -116,5 +115,16 @@ workflow{
     
     if( params.treemix ){
 	    RUN_TREEMIX( FILTER_VCF.out.n2_chrom_vcf_idx_map )
+        }
+    if( params.single_pop_selection ){
+            map_f = FILTER_VCF.out.n2_chrom_vcf_idx_map.map{ chrom, vcf, idx, mp -> mp}.unique()
+            map_f.view()
+            chrom_vcf = FILTER_VCF.out.n2_chrom_vcf_idx_map.map{ chrom, vcf, idx, map -> tuple(chrom, vcf) }
+            SPLIT_IDFILE_BY_POP(
+                map_f
+            )
+            pop_idfile = SPLIT_IDFILE_BY_POP.out.splitted_samples.flatten()
+            chrom_vcf_pop_idfile = chrom_vcf.combine(pop_idfile)
+            chrom_vcf_pop_idfile.view()
         }
 }
