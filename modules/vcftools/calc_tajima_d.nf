@@ -4,21 +4,25 @@ process CALC_TAJIMA_D{
     label "oneCpu"
     container "maulik23/scalepopgen:0.1.1"
     conda "${baseDir}/environment.yml"
-    publishDir("${params.outDir}/selection/${prefix}/", mode:"copy")
+    publishDir("${params.outDir}/selection/unphased_data/tajima_d/${prefix}/", mode:"copy")
 
     input:
-        tuple val(prefix), path(vcfIn), val(pop), path(fileSampleId)
+        tuple val(prefix), path(vcf), path(sample_id)
 
     output:
-        tuple val(pop), path ("${pop}.${prefix}.${windowSize}*"), emit: tajimaD_out
+        tuple val(pop), path ("${pop}_${prefix}_${window_size}*"), emit: tajimad_out
 
     script:
         
-        windowSize = params.windowSize
+        
+        pop = sample_id.baseName
+
+        window_size = params.sel_window_size
 
         """
 
-        vcftools --gzvcf ${vcfIn} --keep ${fileSampleId} --TajimaD ${windowSize} --out ${pop}.${prefix}.${windowSize}
+        vcftools --gzvcf ${vcf} --keep ${sample_id} --TajimaD ${window_size} --out ${pop}_${prefix}_${window_size}
+
 
         """ 
 }

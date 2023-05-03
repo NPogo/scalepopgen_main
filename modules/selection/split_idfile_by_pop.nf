@@ -9,12 +9,13 @@ process SPLIT_IDFILE_BY_POP{
         path(sample_map)
 
     output:
-        path ("*.samples.txt"), emit: splitted_samples
+        path ("*.txt"), emit: splitted_samples
 
     script:
         
         """
-        awk '{print \$1 >>\$2".samples.txt"}' ${sample_map}
+        
+        awk '{print \$1 >>\$2".txt"}' ${sample_map}
 
         """ 
 }

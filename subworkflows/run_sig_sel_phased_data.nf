@@ -14,7 +14,7 @@ include { CALC_iHS } from '../modules/selscan/calc_ihs'
 
 workflow RUN_SIG_SEL_WITHIN_POP{
     take:
-        chrom_vcf_pop_idFile
+        chrom_vcf_idx_popfile
 
     main:
 
