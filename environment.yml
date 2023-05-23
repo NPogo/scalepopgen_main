@@ -34,3 +34,4 @@ dependencies:
         - bioconda::phylip=3.697
         - bioconda::pybedtools=0.9.0
         - bioconda::king=2.2.7
+        - bioconda::sweepfinder2=1.0
