@@ -43,7 +43,6 @@ include { RUN_TREEMIX } from "${baseDir}/subworkflows/run_treemix"
 
 //include { RUN_FSTATS } from "${baseDir}/subworkflows/run_fstats"
 
-//include { RUN_PAIRWISE_FST } from "${baseDir}/subworkflows/run_pairwise_fst"
 
 include { RUN_SIG_SEL_UNPHASED_DATA } from "${baseDir}/subworkflows/run_sig_sel_unphased_data"
 
@@ -115,7 +114,7 @@ workflow{
     if( params.treemix ){
 	    RUN_TREEMIX( FILTER_VCF.out.n2_chrom_vcf_idx_map )
         }
-    if( params.tajima_d || params.pi || params.pairwise_fst ){
+    if( params.tajima_d || params.pi || params.pairwise_fst || params.clr ){
             
             RUN_SIG_SEL_UNPHASED_DATA( FILTER_VCF.out.n2_chrom_vcf_idx_map )
 
