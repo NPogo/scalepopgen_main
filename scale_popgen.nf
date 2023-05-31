@@ -46,6 +46,8 @@ include { RUN_TREEMIX } from "${baseDir}/subworkflows/run_treemix"
 
 include { RUN_SIG_SEL_UNPHASED_DATA } from "${baseDir}/subworkflows/run_sig_sel_unphased_data"
 
+include { RUN_SIG_SEL_PHASED_DATA } from "${baseDir}/subworkflows/run_sig_sel_phased_data"
+
 
 
 workflow{
@@ -118,7 +120,10 @@ workflow{
             
             RUN_SIG_SEL_UNPHASED_DATA( FILTER_VCF.out.n2_chrom_vcf_idx_map )
 
-            /*
-            */
+        }
+
+    if( params.ihs || params.nsl || params.xp_ehh ){
+            RUN_SIG_SEL_PHASED_DATA( FILTER_VCF.out.n2_chrom_vcf_idx_map )
+
         }
 }

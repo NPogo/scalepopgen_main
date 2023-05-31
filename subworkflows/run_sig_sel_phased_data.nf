@@ -2,33 +2,24 @@
 * workflow to carry out signature of selection (single population vs multi-population)
 */
 
-include { CALC_TAJIMA_D } from '../modules/vcftools/calc_tajima_d'
-include { CALC_PI } from '../modules/vcftools/calc_pi'
 include { PHASING_GENOTYPE_BEAGLE } from '../modules/selection/phasing_genotpyes_beagle'
-include { CHECK_INPUT as CHECK_MAP } from '../subworkflows/check_input'
-include { CHECK_INPUT as CHECK_ANC } from '../subworkflows/check_input'
-include { PREPARE_MAP_SELSCAN } from '../modules/selection/prepare_map_selscan'
-include { CALC_iHS } from '../modules/selscan/calc_ihs'
+//include { CHECK_INPUT as CHECK_MAP } from '../subworkflows/check_input'
+//include { CHECK_INPUT as CHECK_ANC } from '../subworkflows/check_input'
+//include { PREPARE_MAP_SELSCAN } from '../modules/selection/prepare_map_selscan'
+//include { CALC_iHS } from '../modules/selscan/calc_ihs'
 //incldue { CALC_NSL } from '../modules/selection/calc_nsl'
 
 
-workflow RUN_SIG_SEL_WITHIN_POP{
+workflow RUN_SIG_SEL_PHASED_DATA{
     take:
         chrom_vcf_idx_popfile
 
     main:
 
-        //calculate Tajima D and pi chrom-wise for each population
-
-
-        CALC_TAJIMA_D( chrom_vcf_pop_idFile )
-
-        CALC_PI( chrom_vcf_pop_idFile )
-
         ///phase chromsome-wise splitted vcf file///
         //prepare input for phasing_genotpyes_beagle//
 
-        chrom_vcf = chrom_vcf_pop_idFile.map{ chrom, vcf, pop, idFile -> tuple(chrom,vcf) }.unique()
+        chrom_vcf = chrom_vcf_idx_popfile.map{ chrom, vcf, pop, idFile -> tuple(chrom,vcf) }.unique()
 
         
         //phase genotypes in vcf files using beagle
@@ -37,6 +28,8 @@ workflow RUN_SIG_SEL_WITHIN_POP{
         ///run iHs and nSL analysis///
 
         // keep unique id file //
+        
+        /*
         pop_idFile = chrom_vcf_pop_idFile.map{ chrom, vcf, pop, idFile -> tuple(pop, idFile) }.unique()
 
         //pop_idFile.view()
@@ -94,4 +87,5 @@ workflow RUN_SIG_SEL_WITHIN_POP{
         
         //pop_file_chrom_phased_T = pop_file_tuple.combine(phasing_genotpyes_beagle_out)
         //split_phased_vcf_by_pop_out = SPLIT_PHASED_VCF_BY_POP(pop_file_chrom_phased_T)
+        */
 }

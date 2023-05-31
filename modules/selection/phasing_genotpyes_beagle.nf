@@ -13,20 +13,20 @@ process PHASING_GENOTYPE_BEAGLE {
      tuple val(chrom), file("*.phased.vcf.gz"), emit: phased_vcf
 
    script:     
-        command = ""
+        args = ""
         def mem_per_thread = task.memory.toMega()-300
         if( params.ref_vcf != "none"){
-                command = command +" ref="+params.ref_vcf
+                args = args +" ref="+params.ref_vcf
             }
         if( params.cm_map != "none"){
-                command = command+" map="+params.cm_map
+                args = args+" map="+params.cm_map
             }
-       command = command +" burnin="+params.burnin_val+" iterations="+params.iterations_val+" impute="+params.impute_status+" ne="+params.ne_val
+       args = args +" burnin="+params.burnin_val+" iterations="+params.iterations_val+" impute="+params.impute_status+" ne="+params.ne_val
 
 
    """
 
-    beagle "-Xmx${mem_per_thread}m" ${command} gt=${vcfIn} out=${chrom}.phased nthreads=${task.cpus}
+    beagle "-Xmx${mem_per_thread}m" ${args} gt=${vcfIn} out=${chrom}.phased nthreads=${task.cpus}
 
    """
 }

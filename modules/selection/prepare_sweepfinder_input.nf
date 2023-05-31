@@ -19,12 +19,7 @@ process PREPARE_SWEEPFINDER_INPUT{
         if( params.anc_files != "none" ){
             args = args + "-a "+ anc
         }
-        if ( params.create_recomb ){
-            args = args + " -r"
-        }
-        if ( params.create_grid ){
-            args = args + " -g"
-        }
+        args = args + " -r"
         
         """
                         
