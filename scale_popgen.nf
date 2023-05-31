@@ -122,7 +122,7 @@ workflow{
 
         }
 
-    if( params.ihs || params.nsl || params.xp_ehh ){
+    if( params.ihs || params.nsl || params.xpehh ){
             RUN_SIG_SEL_PHASED_DATA( FILTER_VCF.out.n2_chrom_vcf_idx_map )
 
         }

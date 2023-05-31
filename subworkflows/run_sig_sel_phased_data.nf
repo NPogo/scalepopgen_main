@@ -6,7 +6,7 @@ include { PHASING_GENOTYPE_BEAGLE } from '../modules/selection/phasing_genotpyes
 include { SPLIT_VCF_BY_POP } from '../modules/vcftools/split_vcf_by_pop'
 include { PREPARE_MAP_SELSCAN } from '../modules/selection/prepare_map_selscan'
 include { CALC_iHS } from '../modules/selscan/calc_ihs'
-//incldue { CALC_NSL } from '../modules/selection/calc_nsl'
+include { CALC_XPEHH } from '../modules/selscan/calc_xpehh'
 
 def PREPARE_PAIRWISE_VCF( file_list_pop ){
 
@@ -47,7 +47,18 @@ workflow RUN_SIG_SEL_PHASED_DATA{
 
         //preparing map file ihs, nsl and XP-EHH analysis, needed by selscan
 
-        chrom_recombmap = params.selscan_map =="none" ? PREPARE_MAP_SELSCAN( chrom_vcf ) : "none"
+
+        if( params.selscan_map != "none" ){
+            Channel
+                .fromPath(params.selscan_map)
+                .splitCsv(sep:",")
+                .map{ chrom, recombmap -> if(!file(recombmap).exists() ){ exit 1, 'ERROR: input anc file does not exist  \
+                    -> ${anc}' }else{tuple(chrom, file(recombmap))} }
+                .set{ n1_chrom_recombmap }
+        }
+        else{
+                n1_chrom_recombmap = PREPARE_MAP_SELSCAN( chrom_vcf )
+        }
 
 
         // split phased vcf file by pop --> to be used for iHS, XP-EHH, nSL
@@ -62,23 +73,12 @@ workflow RUN_SIG_SEL_PHASED_DATA{
 
         p_chrom_vcf = SPLIT_VCF_BY_POP.out.pop_phased_vcf.flatten().map{ p_vcf -> tuple( p_vcf.baseName.split("__")[0], p_vcf) }
         
-        pairwise_vcf_t = PREPARE_PAIRWISE_VCF(SPLIT_VCF_BY_POP.out.pop_phased_vcf).unique()
+        chrom_tvcf_rvcf = PREPARE_PAIRWISE_VCF(SPLIT_VCF_BY_POP.out.pop_phased_vcf).unique().map{ p1_vcf, p2_vcf -> tuple( p1_vcf.baseName.split("__")[0], p1_vcf, p2_vcf) }
 
 
 
         if( params.ihs ){
-                if( chrom_recombmap == "none" ){
-                    Channel
-                        .fromPath(params.selscan_map)
-                        .splitCsv(sep:",")
-                        .map{ chrom, recombmap -> if(!file(recombmap).exists() ){ exit 1, 'ERROR: input anc file does not exist  \
-                            -> ${anc}' }else{tuple(chrom, file(recombmap))} }
-                        .set{ n1_chrom_recombmap }
-                }
-                else{
-                        n1_chrom_recombmap = chrom_recombmap
-                }
-
+                
                 n1_p_chrom_vcf_recombmap = p_chrom_vcf.combine(n1_chrom_recombmap, by:0)
 
                 if(params.anc_files != "none" ){
@@ -98,5 +98,12 @@ workflow RUN_SIG_SEL_PHASED_DATA{
                     n2_p_chrom_vcf_recombmap_anc
                 )
 
+        }
+        if( params.xpehh ){
+               chrom_tvcf_rvcf_recombmap = chrom_tvcf_rvcf.combine(n1_chrom_recombmap, by: 0)
+               
+                CALC_XPEHH(
+                    chrom_tvcf_rvcf_recombmap
+                )
         }
 }
