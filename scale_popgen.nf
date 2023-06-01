@@ -74,9 +74,9 @@ workflow{
 
 
 
-    // convert vcf to plink and get the ids of unrelated animals
+    // convert vcf to plink and get the ids of all samples to be kept
 
-    if( params.rel_coeff_cutoff > 0 || params.mind > 0 || params.rem_indi != "none" ){
+    if( params.apply_indi_filters ){
 
         CONVERT_VCF_TO_PLINK( chrom_vcf_idx_map )
 
@@ -93,7 +93,7 @@ workflow{
     
     // prepare input channel for filter vcf    
 
-    chrom_vcf_idx_map_indilist = n1_chrom_vcf_idx_map.combine( ( params.rel_coeff_cutoff > 0 || params.mind > 0 || params.rem_indi != "none" ) ? PREPARE_KEEP_INDI_LIST.out.indi_list : ["none"])
+    chrom_vcf_idx_map_indilist = n1_chrom_vcf_idx_map.combine( params.apply_indi_filters ? PREPARE_KEEP_INDI_LIST.out.indi_list : ["none"])
 
     //chrom_vcf_idx_map_indilist.view()
     
